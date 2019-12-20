@@ -31,3 +31,13 @@
     * Possibilité d’exporter ses cours / séances  
     * Possibilité d’importer des cours / séances  
 
+
+## Implémentation des fonctionnalités :
+
+1. Settings :
+   Pour implémenter les settings, il est necéssaire de créer des fonctions de lecture du fichier settings et les fonctions necéssaire à la modification des settings individuels.  
+   En l'occurence, pour 5 fonctionnalités 5 fonctions spécifiques sont requises, en plus de la fonction qui crée le fichier config originel, celle qui ouvre le fichier (qui ne sera jamais utilisée telle quelle mais sert a construire les fonctions spécifiques) :
+   
+   * void 
+
+2. Cours :
