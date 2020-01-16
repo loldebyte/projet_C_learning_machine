@@ -36,8 +36,12 @@
 
 1. Settings :
    Pour implémenter les settings, il est necéssaire de créer des fonctions de lecture du fichier settings et les fonctions necéssaire à la modification des settings individuels.  
-   En l'occurence, pour 5 fonctionnalités 5 fonctions spécifiques sont requises, en plus de la fonction qui crée le fichier config originel, celle qui ouvre le fichier (qui ne sera jamais utilisée telle quelle mais sert a construire les fonctions spécifiques) :
+   En l'occurence, pour 5 fonctionnalités 5 fonctions spécifiques sont requises, en plus de la fonction qui crée le fichier config originel, celle qui ouvre le fichier (qui ne sera jamais utilisée telle quelle mais sert a construire les fonctions spécifiques) et celle qui si le fichier existe, il est valide :
    
+   * void create_default_settings_file(const char * path) // crée un fichier config avec les parametres par defaut
+   * FILE * open_config(const char * path) // renvoie un stream vers le fichier config (appelle create_default_settings_file si le fichier n'existe pas ou si <> renvoie -1)
+   * int conf_file_is_valid(const char * path) // renvoie -1 si le fichier existe mais n'a pas la bonne config, 0 s'il n'existe pas, 1 sinon.
    * void 
+
 
 2. Cours :
