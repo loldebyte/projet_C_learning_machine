@@ -46,10 +46,15 @@
    * void font_size_change(const char * font)
    * void sound(void) // change sound param, if sound = true then sound <- false else sound <- true
    * void help(void) // idem pour l'aide
+
 2. Cours
    Pour implémenter les fonctionnalités liées aux cours, il est nécessaire de créer de nombreuses fonctions permettant aux fonctions spécifiques aux fonctionnalités listées de fonctionner correctement : 
 
-   * void add_category(const char * new_categorie, )
+   * void add_category(const char * new_categorie, <wherever the fuck this shit is saved>)
+   * void add_cours(const char * new_cours, const char * category, <wherever the fuck this shit is saved>)
+   * void rename_cours(const char * old_name, const char * new_name, const char * category, <wherever the fuck this shit is saved>)
+   * void edit_description(const char * text, const char * cours, const char * category, <wherever the fuck this shit's saved>)
+   * PLUS les fonctions interagissant avec les wherever the fuck...
 
-
-2. Cours :
+3. Questions
+   
