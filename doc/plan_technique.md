@@ -59,6 +59,7 @@
 3. Questions
   
 4. GUI
+  #include <gtk/gtk.h>
    Avec GTK, la création des différents types d'interfaces et de leur contenu : "objets" (boutons, zone de saisie), "labels" (texte à afficher) passent par plusieurs étapes, et peuvent être comprises dans des fonctions afin d'optimiser le traitement:
    * GtkWidget * generate_window(gchar * titre_de_la_fenetre, int hauteur, int largeur)
    * gtk_widget_show_all(GtkWidget * Contenant)// affiche all tha shit was put in Contenant
@@ -67,3 +68,14 @@ La subtilité de GTK est que tout widget (typé GtkWidget *) possède une notion
 
    La gestion des events avec GTK se fait via des signals avec :
    * g_signal_connect(G_OBJECT(fcking_widget_qui_accueil_le_signal),"nom_du_signal", G_CALLBACK(fonction_appelée), ptr * parametre_à_passer_à_la_fonction)
+
+5. MySQL
+  #include<mysql.h>
+   L'installation du projet nécessite la création de la base de donnée, qui va accueillir, entre autre, les cours, les catégories, les questions, etc. Pour ce faire, une fonction peut être créée afin d'automatiser cette installation, à condition de renseigner le username et le password d'un user qui possède les droits nécessaires à cette création.
+   * int setup_database(char* username, char* password);
+  A noter que cette fonction en appellera plusieurs autres 
+   * MYSQL* mysql_init(NULL) // Function qui initialise la connection à mysql, connexion qu'on va stocker dans une variable MYSQL*
+   * mysql_real_connect(MYSQL* connexion, "localhost", "username", "password", NULL, 0, NULL, 0) // renvoie NULL si la connexion est refusée ou échoue
+   * mysql_query(MYSQL* connexion, char* instruction_sql) // Renvoie NULL si failed
+   On peut donc faire passer n'importe quelle instruction avec mysql_query, à condition que la connexion ai été ouverte avec un user qui possède suffisament de droits.
+
