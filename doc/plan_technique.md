@@ -43,7 +43,7 @@
    * int conf_file_is_valid(const char * path) // renvoie -1 si le fichier existe mais n'a pas la bonne config, 0 s'il n'existe pas, 1 sinon.
    * void background_color_change(const char * color) // utiliser fgets et strstr puis fseek avec une valeur hardcodée(correspondant au contenu de create_default_settings_file) pour faire pointer le filestream au bon endroit
    * void card_color_change(const char * color)
-   * void font_size_change(const char * font)
+   * void font_size_change(const uint8_t)
    * void sound(void) // change sound param, if sound = true then sound <- false else sound <- true
    * void help(void) // idem pour l'aide
 
