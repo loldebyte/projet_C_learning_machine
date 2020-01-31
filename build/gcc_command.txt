@@ -1,3 +1,3 @@
-gcc $(pkg-config --libs --cflags gtk+-2.0) `mysql_config --cflags --include --libs` main.c -o name_of_executable
+gcc $(pkg-config -Wall -Wextra --libs --cflags gtk+-2.0) `mysql_config --cflags --include --libs` main.c -o name_of_executable
 
 
