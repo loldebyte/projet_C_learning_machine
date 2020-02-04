@@ -13,27 +13,23 @@ GtkWidget * generate_window(char * title, int height, int width){
     return p_window;
 
 };
-
-void destroy_window(GtkWidget *widget, gpointer data)
-{
-    gtk_main_quit();
-}
-
 int main(int argc,char **argv)
 {
     
     gtk_init(&argc,&argv);
     
     char * title = "Learning cards";
-    GtkWidget* headtitle;
-    GtkWidget* principal_window;
+    GtkWidget* grid, *headtitle, *principal_window;
 
     principal_window = generate_window(title, 1200, 800);
+    grid = gtk_grid_new();
+    gtk_container_add (GTK_CONTAINER(principal_window), grid);
+
     headtitle = gtk_label_new("Bienvenue sur LearnCards\nLearn smart\nAppuyez sur une touche pour commencer !");
-    
-    gtk_container_add (GTK_CONTAINER(principal_window), headtitle);
+    gtk_grid_attach(GTK_GRID(grid), headtitle, 0, 0, 1, 1);
+
     gtk_label_set_justify (GTK_LABEL(headtitle), GTK_JUSTIFY_CENTER);
-	g_signal_connect(G_OBJECT(principal_window), "key_press_event", G_CALLBACK(destroy_window), NULL);
+	g_signal_connect(G_OBJECT(principal_window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
     
     gtk_widget_show_all(principal_window);// Showing all the widget under principal_window
 

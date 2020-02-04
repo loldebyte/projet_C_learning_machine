@@ -59,15 +59,18 @@
 3. Questions
   
 4. GUI
-  #include <gtk/gtk.h>
+  #include <gtk/gtk.h> // gtk 3.0
    Avec GTK, la création des différents types d'interfaces et de leur contenu : "objets" (boutons, zone de saisie), "labels" (texte à afficher) passent par plusieurs étapes, et peuvent être comprises dans des fonctions afin d'optimiser le traitement:
    * GtkWidget * generate_window(gchar * titre_de_la_fenetre, int hauteur, int largeur)
    * gtk_widget_show_all(GtkWidget * Contenant)// affiche all tha shit was put in Contenant
 
-La subtilité de GTK est que tout widget (typé GtkWidget *) possède une notion d'héritage du widget supérieur. En clair, chaque widget possède une hiérarchie en fonction d'où il est placé (dans une fenêtre, une boite de dialogue, etc). Les modifications apportées à un widget sont donc appliquées sur tous les "sous-widgets" qu'il contient.
+   La subtilité de GTK est que tout widget (typé GtkWidget *) possède une notion d'héritage du widget supérieur. En clair, chaque widget possède une hiérarchie en fonction d'où il est placé (dans une fenêtre, une boite de dialogue, etc). Les fonctions utilisables sur un widget peuvent donc être appliquées sur tous les "sous-widgets" qu'il contient.
 
    La gestion des events avec GTK se fait via des signals avec :
    * g_signal_connect(G_OBJECT(fcking_widget_qui_accueil_le_signal),"nom_du_signal", G_CALLBACK(fonction_appelée), ptr * parametre_à_passer_à_la_fonction)
+
+   Pour disposer plusieurs widgets (comme les boutons, les espaces de saisies, etc.) dans un seul container, il faut utiliser une Gtkwidget * grid, qui va cadrier l'espace du conteneur en plusieurs "sous-conteneurs" dans lesquels on va pouvoir "l'attacher":
+   * void * gtk_grid_attach(GTK_GRID(grid), gp * contenu, int case_x, int case_y, int largeur_en_case ,int_hauteur_en_case); // l'origine du repère se situe en haut à gauche
 
 5. MySQL
   #include<mysql.h>
