@@ -34,7 +34,27 @@ MYSQL* open_database(){ // Don't forget to close the connexion !
     return con;
 }
 
-/* void generate_cours_list(GtkWidget * liste_cours){
+MYSQL_RES * dbquery(char * query){
+    if (mysql_query(con, query)) 
+  {
+      finish_with_error(con);
+      printf("debug : wrong query");
+  }
+  MYSQL_RES *result = mysql_store_result(con);
+  
+  if (result == NULL) 
+  {
+      finish_with_error(con);
+      printf("debug : result reference failed");
+  }
+    return result;
+}
+
+/*
+
+
+    int num_fields = mysql_num_fields(result);
+    mysql_free_result(result);
     gtk_list_box_prepend(GTK_LIST_BOX(liste_cours), GTK_WIDgtk_list_box_prepend(GTK_LIST_BOX(liste_cours), GTK_WIDGET(label_cours1));GET(label_cours1));
     gtk_list_box_prepend(GTK_LIST_BOX(liste_cours), GTK_WIDGET(label_cours2));
 } WILL WORK WITH BDD IMPORTS*/ 
