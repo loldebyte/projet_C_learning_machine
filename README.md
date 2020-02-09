@@ -1,4 +1,4 @@
-# unoriginally_named_projet_C
+# projet_C_learning_machine
 Projet de C 2A1 ESGI
 
 structure du projet :
