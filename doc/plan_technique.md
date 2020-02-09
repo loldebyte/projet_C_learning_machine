@@ -47,11 +47,11 @@
 2. Cours
    Pour implémenter les fonctionnalités liées aux cours, il est nécessaire de créer de nombreuses fonctions permettant aux fonctions spécifiques aux fonctionnalités listées de fonctionner correctement : 
 
-   * void add_category(const char * new_categorie, <wherever the fuck this shit is saved>)
-   * void add_cours(const char * new_cours, const char * category, <wherever the fuck this shit is saved>)
-   * void rename_cours(const char * old_name, const char * new_name, const char * category, <wherever the fuck this shit is saved>)
-   * void edit_description(const char * text, const char * cours, const char * category, <wherever the fuck this shit's saved>)
-   * PLUS les fonctions interagissant avec les wherever the fuck...
+   * void add_category(const char * new_categorie, <wherever it is saved>)
+   * void add_cours(const char * new_cours, const char * category, <wherever it is saved>)
+   * void rename_cours(const char * old_name, const char * new_name, const char * category, <wherever it is saved>)
+   * void edit_description(const char * text, const char * cours, const char * category, <wherever it is saved>)
+   * PLUS les fonctions interagissant avec les wherever it is...
 
 3. Questions
   
@@ -64,7 +64,7 @@
    La subtilité de GTK est que tout widget (typé GtkWidget *) possède une notion d'héritage du widget supérieur. En clair, chaque widget possède une hiérarchie en fonction d'où il est placé (dans une fenêtre, une boite de dialogue, etc). Les fonctions utilisables sur un widget peuvent donc être appliquées sur tous les "sous-widgets" qu'il contient.
 
    La gestion des events avec GTK se fait via des signals avec :
-   * g_signal_connect(G_OBJECT(fcking_widget_qui_accueil_le_signal),"nom_du_signal", G_CALLBACK(fonction_appelée), ptr * parametre_à_passer_à_la_fonction)
+   * g_signal_connect(G_OBJECT(widget_qui_accueil_le_signal),"nom_du_signal", G_CALLBACK(fonction_appelée), ptr * parametre_à_passer_à_la_fonction)
 
    Pour disposer plusieurs widgets (comme les boutons, les espaces de saisies, etc.) dans un seul container, il faut utiliser une Gtkwidget * grid, qui va cadrier l'espace du conteneur en plusieurs "sous-conteneurs" dans lesquels on va pouvoir "l'attacher":
    * void * gtk_grid_attach(GTK_GRID(grid), gp * contenu, int case_x, int case_y, int largeur_en_case ,int_hauteur_en_case); // l'origine du repère se situe en haut à gauche
