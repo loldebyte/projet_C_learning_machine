@@ -1,0 +1,1 @@
+gcc $(pkg-config --libs --cflags gtk+-3.0) `mysql_config --cflags --include --libs` -c smartlearnlib.c && gcc smartlearnlib.o $(pkg-config --libs --cflags gtk+-3.0) `mysql_config --cflags --include --libs` main.c -o Learning_on_tha_beat && ./Learning_on_tha_beat

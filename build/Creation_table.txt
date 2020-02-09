@@ -1,0 +1,56 @@
+CREATE DATABASE project;
+use project;
+
+CREATE TABLE seance(
+	id_seance int PRIMARY KEY auto_increment,
+	nom_seance varchar(50),
+	temps int,
+	date_creation DATE,
+	description varchar (300),
+	nb_echec_max int
+);
+
+CREATE TABLE score(
+	id_score int PRIMARY KEY auto_increment,
+	id_seance int REFERENCES seance(id_seance),
+	nb_erreur int,
+	temps int,
+	date_score DATE,
+	seance_finie int
+);
+
+CREATE TABLE categorie(
+	nom_categorie varchar(20) PRIMARY KEY
+);
+
+CREATE TABLE cours(
+	id_cours int PRIMARY KEY auto_increment,
+	nom_cours varchar (50),
+	date_creation DATE,
+	description varchar (300),
+	nom_categorie varchar(20) REFERENCES categorie(nom_categorie)
+);
+
+CREATE TABLE question(
+	id_question int PRIMARY KEY auto_increment,
+	type_question int,
+	enonce varchar(300),
+	image varchar(300),
+	id_cours int REFERENCES cours(id_cours)
+);
+
+CREATE TABLE reponse(
+	id_reponse int PRIMARY KEY auto_increment,
+	contenu varchar(15),
+	id_question int REFERENCES question(id_question)
+);
+
+
+CREATE TABLE composition(
+	id_seance int REFERENCES seance(id_seance),
+	id_cours int REFERENCES cours(id_cours),
+	PRIMARY KEY(id_seance, id_cours),
+	nombre_cours int
+);
+
+show tables;

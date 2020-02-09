@@ -38,7 +38,7 @@
    
    * void create_default_settings_file(const char * path) // crée un fichier config avec les parametres par defaut
    * FILE * open_config(const char * path) // renvoie un stream vers le fichier config (appelle create_default_settings_file si le fichier n'existe pas ou si <> renvoie -1)
-   * int conf_file_is_valid(const char * path) // renvoie -1 si le fichier existe mais n'a pas la bonne config, 0 s'il n'existe pas, 1 sinon.
+   * int8_t conf_file_is_valid(const char * path) // renvoie -1 si le fichier existe mais n'a pas la bonne config, 0 s'il n'existe pas, 1 sinon.
    * void background_color_change(const char * color) // utiliser fgets et strstr puis fseek avec une valeur hardcodée(correspondant au contenu de create_default_settings_file) pour faire pointer le filestream au bon endroit
    * void card_color_change(const char * color)
    * void font_size_change(const char * font)
@@ -53,4 +53,28 @@
    * PLUS les fonctions interagissant avec les wherever the fuck...
 
 3. Questions
-   
+  
+4. GUI
+  #include <gtk/gtk.h> // gtk 3.0
+   Avec GTK, la création des différents types d'interfaces et de leur contenu : "objets" (boutons, zone de saisie), "labels" (texte à afficher) passent par plusieurs étapes, et peuvent être comprises dans des fonctions afin d'optimiser le traitement:
+   * GtkWidget * generate_window(gchar * titre_de_la_fenetre, int hauteur, int largeur)
+   * gtk_widget_show_all(GtkWidget * Contenant)// affiche all tha shit was put in Contenant
+
+   La subtilité de GTK est que tout widget (typé GtkWidget *) possède une notion d'héritage du widget supérieur. En clair, chaque widget possède une hiérarchie en fonction d'où il est placé (dans une fenêtre, une boite de dialogue, etc). Les fonctions utilisables sur un widget peuvent donc être appliquées sur tous les "sous-widgets" qu'il contient.
+
+   La gestion des events avec GTK se fait via des signals avec :
+   * g_signal_connect(G_OBJECT(fcking_widget_qui_accueil_le_signal),"nom_du_signal", G_CALLBACK(fonction_appelée), ptr * parametre_à_passer_à_la_fonction)
+
+   Pour disposer plusieurs widgets (comme les boutons, les espaces de saisies, etc.) dans un seul container, il faut utiliser une Gtkwidget * grid, qui va cadrier l'espace du conteneur en plusieurs "sous-conteneurs" dans lesquels on va pouvoir "l'attacher":
+   * void * gtk_grid_attach(GTK_GRID(grid), gp * contenu, int case_x, int case_y, int largeur_en_case ,int_hauteur_en_case); // l'origine du repère se situe en haut à gauche
+
+5. MySQL
+  #include<mysql.h>
+   L'installation du projet nécessite la création de la base de donnée, qui va accueillir, entre autre, les cours, les catégories, les questions, etc. Pour ce faire, une fonction peut être créée afin d'automatiser cette installation, à condition de renseigner le username et le password d'un user qui possède les droits nécessaires à cette création.
+   * int setup_database(char* username, char* password);
+  A noter que cette fonction en appellera plusieurs autres 
+   * MYSQL* mysql_init(NULL) // Function qui initialise la connection à mysql, connexion qu'on va stocker dans une variable MYSQL*
+   * mysql_real_connect(MYSQL* connexion, "localhost", "username", "password", NULL, 0, NULL, 0) // renvoie NULL si la connexion est refusée ou échoue
+   * mysql_query(MYSQL* connexion, char* instruction_sql) // Renvoie NULL si failed
+   On peut donc faire passer n'importe quelle instruction avec mysql_query, à condition que la connexion ai été ouverte avec un user qui possède suffisament de droits.
+

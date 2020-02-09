@@ -1,0 +1,11 @@
+void finish_with_error();
+GtkWidget * generate_window();
+MYSQL* open_database();
+MYSQL_RES * dbquery();
+void close_popup();
+void cours_form();
+void free_lock();
+void lessons();
+void transition_lessons();
+void home();
+void transition_home();
