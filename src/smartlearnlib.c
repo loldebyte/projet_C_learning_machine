@@ -196,6 +196,7 @@ void lessons(){
     printf("\ndebug : Cours lancé\n");
     char * title = "Mes cours";
     int * lock_ptr;
+    int i, j;
     lock_ptr = malloc(sizeof(lock_ptr));
     *lock_ptr = 0;
     GtkWidget * grid, *principal_window, *label_cours1, *label_cours2, *liste_cours, *cours_button;
@@ -203,6 +204,7 @@ void lessons(){
     label_cours2 = gtk_label_new("Cours 2");
 
     MYSQL* con = open_database();
+    MYSQL_RES * result;
 
     principal_window = generate_window(title, 800, 800);
     grid = gtk_grid_new();
@@ -211,13 +213,38 @@ void lessons(){
     liste_cours = gtk_list_box_new();
     gtk_list_box_prepend(GTK_LIST_BOX(liste_cours), GTK_WIDGET(label_cours1));
     gtk_list_box_prepend(GTK_LIST_BOX(liste_cours), GTK_WIDGET(label_cours2));
-    gtk_grid_attach(GTK_GRID(grid), GTK_WIDGET(liste_cours), 0, 0, 1, 1);
 
     cours_button = gtk_button_new_with_label("Ajouter un cours");
     gtk_grid_attach(GTK_GRID(grid), GTK_WIDGET(cours_button), 0, 1, 1, 1);   
     printf("\nLesson : Lock : %d | %d\n",lock_ptr, *lock_ptr);
     g_signal_connect(cours_button, "clicked", G_CALLBACK(cours_form), lock_ptr);
 
+    dbinsert(con, "use project");
+    result = dbquery(con, "SELECT nom_cours FROM cours");
+    int num_fields = mysql_num_fields(result);
+    MYSQL_ROW row;
+    GtkWidget * result_list;
+    /*for (i=0 ; i<num_fields ; i++){
+       *(result_list + i) = malloc(sizeof(GtkWidget));
+    }*/
+    i = 0;
+    printf("\ndebug : malloc effectué\n");
+    while ((row = mysql_fetch_row(result))) 
+    {
+        printf("\ndebug : boucle\n"); 
+            printf("\n row[%d] : %s\n", i, row[0]);
+            result_list = gtk_label_new(row[0]);
+            printf("\ndebug : recent_list[%d] affectation : %s\n", i, row[0]);
+            gtk_list_box_prepend(GTK_LIST_BOX(liste_cours), GTK_WIDGET(result_list));
+            printf("\ndebug : added in listbox\n");
+            
+    }
+    printf("\ndebug : sortie de boucle");
+    gtk_grid_attach(GTK_GRID(grid), GTK_WIDGET(liste_cours), 0, 0, 1, 1);
+    
+    // mysql_free_result(result);
+    // mysql_close(con);
+    
 
     g_signal_connect(principal_window, "destroy", G_CALLBACK(free_lock), lock_ptr);
     
@@ -226,11 +253,9 @@ void lessons(){
     
     gtk_widget_show_all(principal_window);
 
-
-    gtk_main();
 }
 
-void transition_lessons(GtkWidget * principal_window){
+void transition_lessons(GtkWidget * button, GtkWidget *principal_window){
     gtk_window_close(GTK_WINDOW(principal_window));
     lessons();
 }

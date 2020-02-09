@@ -5,9 +5,7 @@
   * Settings
     * Possibilité de changer la couleur du fond d’écran  
     * Possibilité de changer la couleur de la carte  
-    * Possibilité de choisir la taille de la police  
-    * Possibilité d’activer / désactiver le son  
-    * Activer / désactiver les aides à l’utilisation  
+    * Possibilité de choisir la taille de la police
   * Cours
     * Possibilité de créer un cours dans une catégorie  
     * Possibilité de créer une catégorie ou d’en effacer une  
@@ -35,12 +33,12 @@
 ## Implémentation des fonctionnalités :
 
 1. Settings :
-   Pour implémenter les settings, il est necéssaire de créer des fonctions de lecture du fichier settings et les fonctions necéssaire à la modification des settings individuels.  
-   En l'occurence, pour 5 fonctionnalités 5 fonctions spécifiques sont requises, en plus de la fonction qui crée le fichier config originel, celle qui ouvre le fichier (qui ne sera jamais utilisée telle quelle mais sert a construire les fonctions spécifiques) et celle qui si le fichier existe, il est valide :
+   Pour implémenter les settings, il est nécessaire de créer des fonctions de lecture du fichier settings et les fonctions necéssaire à la modification des settings individuels.  
+   En l'occurence, pour 5 fonctionnalités 5 fonctions spécifiques sont requises, en plus de la fonction qui crée le fichier config original, celle qui ouvre le fichier (qui ne sera jamais utilisée telle quelle mais sert à construire les fonctions spécifiques) et celle de vérification de l'existance du fichier :
    
    * void create_default_settings_file(const char * path) // crée un fichier config avec les parametres par defaut
    * FILE * open_config(const char * path) // renvoie un stream vers le fichier config (appelle create_default_settings_file si le fichier n'existe pas ou si <> renvoie -1)
-   * int8_t conf_file_is_valid(const char * path) // renvoie -1 si le fichier existe mais n'a pas la bonne config, 0 s'il n'existe pas, 1 sinon.
+   * int8_t conf_file_is_valid(const char * path) // renvoie -1 si le fichier existe mais n'a pas la bonne configuration, 0 s'il n'existe pas, 1 sinon.
    * void background_color_change(const char * color) // utiliser fgets et strstr puis fseek avec une valeur hardcodée(correspondant au contenu de create_default_settings_file) pour faire pointer le filestream au bon endroit
    * void card_color_change(const char * color)
    * void font_size_change(const uint8_t)
@@ -50,11 +48,11 @@
 2. Cours
    Pour implémenter les fonctionnalités liées aux cours, il est nécessaire de créer de nombreuses fonctions permettant aux fonctions spécifiques aux fonctionnalités listées de fonctionner correctement : 
 
-   * void add_category(const char * new_categorie, <wherever the fuck this shit is saved>)
-   * void add_cours(const char * new_cours, const char * category, <wherever the fuck this shit is saved>)
-   * void rename_cours(const char * old_name, const char * new_name, const char * category, <wherever the fuck this shit is saved>)
-   * void edit_description(const char * text, const char * cours, const char * category, <wherever the fuck this shit's saved>)
-   * PLUS les fonctions interagissant avec les wherever the fuck...
+   * void add_category(const char * new_categorie, <file>)
+   * void add_cours(const char * new_cours, const char * category, <file>)
+   * void rename_cours(const char * old_name, const char * new_name, const char * category, <file>)
+   * void edit_description(const char * text, const char * cours, const char * category, <file>)
+   * PLUS les fonctions interagissant avec les fichiers
 
 3. Questions
   
@@ -62,15 +60,23 @@
   #include <gtk/gtk.h> // gtk 3.0
    Avec GTK, la création des différents types d'interfaces et de leur contenu : "objets" (boutons, zone de saisie), "labels" (texte à afficher) passent par plusieurs étapes, et peuvent être comprises dans des fonctions afin d'optimiser le traitement:
    * GtkWidget * generate_window(gchar * titre_de_la_fenetre, int hauteur, int largeur)
-   * gtk_widget_show_all(GtkWidget * Contenant)// affiche all tha shit was put in Contenant
+   * gtk_widget_show_all(GtkWidget * Contenant)// affiche tout les widgets de contenant
 
    La subtilité de GTK est que tout widget (typé GtkWidget *) possède une notion d'héritage du widget supérieur. En clair, chaque widget possède une hiérarchie en fonction d'où il est placé (dans une fenêtre, une boite de dialogue, etc). Les fonctions utilisables sur un widget peuvent donc être appliquées sur tous les "sous-widgets" qu'il contient.
 
    La gestion des events avec GTK se fait via des signals avec :
-   * g_signal_connect(G_OBJECT(fcking_widget_qui_accueil_le_signal),"nom_du_signal", G_CALLBACK(fonction_appelée), ptr * parametre_à_passer_à_la_fonction)
+   * g_signal_connect(G_OBJECT(GtkWidget * widget_who_get_signal),"nom_du_signal", G_CALLBACK(fonction_appelée), gptr * parametre_à_passer_à_la_fonction)
 
    Pour disposer plusieurs widgets (comme les boutons, les espaces de saisies, etc.) dans un seul container, il faut utiliser une Gtkwidget * grid, qui va cadrier l'espace du conteneur en plusieurs "sous-conteneurs" dans lesquels on va pouvoir "l'attacher":
    * void * gtk_grid_attach(GTK_GRID(grid), gp * contenu, int case_x, int case_y, int largeur_en_case ,int_hauteur_en_case); // l'origine du repère se situe en haut à gauche
+
+   Lors d'un changement d'un menu à l'autre, on effectue une transition où la fenêtre va ouvrir celle du menu suivant et va se fermer ensuite. Comme les fenêtres appelées sont différentes, une fonction spécifique a été créée pour chaque transition vers un menu particulier.
+   * void transition_menu(GtkWidget * principal_window){
+        gtk_window_close(GTK_WINDOW(principal_window));// fermeture de la fenêtre actuelle
+        menu();// ouverture du prochain menu (principal, cours, exercice, etc)
+     }
+   Contrairement aux pop-up, qui s'ouvre et se ferment en activant un verrou, qui n'autorise qu'une seule popup à être ouverte à la fois.
+   * void close_popup(GtkWidget* popup, int * lock)// qui libère le verrou
 
 5. MySQL
   #include<mysql.h>
@@ -78,7 +84,12 @@
    * int setup_database(char* username, char* password);
   A noter que cette fonction en appellera plusieurs autres 
    * MYSQL* mysql_init(NULL) // Function qui initialise la connection à mysql, connexion qu'on va stocker dans une variable MYSQL*
-   * mysql_real_connect(MYSQL* connexion, "localhost", "username", "password", NULL, 0, NULL, 0) // renvoie NULL si la connexion est refusée ou échoue
+   * mysql_connect(MYSQL* connexion, "localhost", "username", "password", NULL, 0, NULL, 0) // renvoie NULL si la connexion est refusée ou échoue
    * mysql_query(MYSQL* connexion, char* instruction_sql) // Renvoie NULL si failed
    On peut donc faire passer n'importe quelle instruction avec mysql_query, à condition que la connexion ai été ouverte avec un user qui possède suffisament de droits.
 
+   Pour simplifier les traitements et éviter les répétitions de codes, 3 fonctions principales ont été créée pour gérer la base de donnée :
+   * MYSQL* open_database(); // renvoie un pointeur de structure MYSQL vers la connexion établie dans la fonction. Cette connexion est testée et affiche sur console les erreurs.
+   * MYSQL_RES * dbquery(MYSQL * con, char * query) //Utilisée pour soumettre une requête renvoyant des données. On y introduit le ptr de connexion, la chaine contenant la requête et la valeur retournée est le résultat structuré MYSQL_RES, qu'on décomposera plus tard en MYSQL_ROW
+   * void dbinsert(MYSQL * con, char * query) // Utilisée pour soumettre une requête qui ne renvoie rien. La requête est tout de même vérifiée avant. Idem que précédent pour les paramètres à passer
+ 
