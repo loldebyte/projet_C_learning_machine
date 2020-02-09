@@ -42,6 +42,7 @@
    * void background_color_change(const char * color) // utiliser fgets et strstr puis fseek avec une valeur hardcodée(correspondant au contenu de create_default_settings_file) pour faire pointer le filestream au bon endroit
    * void card_color_change(const char * color)
    * void font_size_change(const char * font)
+   * Struct settings get_current_settings(const char * path)
 
 2. Cours
    Pour implémenter les fonctionnalités liées aux cours, il est nécessaire de créer de nombreuses fonctions permettant aux fonctions spécifiques aux fonctionnalités listées de fonctionner correctement : 
