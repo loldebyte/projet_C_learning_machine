@@ -5,7 +5,7 @@
   * Settings
     * Possibilité de changer la couleur du fond d’écran  
     * Possibilité de changer la couleur de la carte  
-    * Possibilité de choisir la taille de la police
+    * Possibilité de choisir la taille de la police  
   * Cours
     * Possibilité de créer un cours dans une catégorie  
     * Possibilité de créer une catégorie ou d’en effacer une  
@@ -41,18 +41,17 @@
    * int8_t conf_file_is_valid(const char * path) // renvoie -1 si le fichier existe mais n'a pas la bonne configuration, 0 s'il n'existe pas, 1 sinon.
    * void background_color_change(const char * color) // utiliser fgets et strstr puis fseek avec une valeur hardcodée(correspondant au contenu de create_default_settings_file) pour faire pointer le filestream au bon endroit
    * void card_color_change(const char * color)
-   * void font_size_change(const uint8_t)
-   * void sound(void) // change sound param, if sound = true then sound <- false else sound <- true
-   * void help(void) // idem pour l'aide
+   * void font_size_change(const char * font)
+   * Struct settings get_current_settings(const char * path)
 
 2. Cours
    Pour implémenter les fonctionnalités liées aux cours, il est nécessaire de créer de nombreuses fonctions permettant aux fonctions spécifiques aux fonctionnalités listées de fonctionner correctement : 
 
-   * void add_category(const char * new_categorie, <file>)
-   * void add_cours(const char * new_cours, const char * category, <file>)
-   * void rename_cours(const char * old_name, const char * new_name, const char * category, <file>)
-   * void edit_description(const char * text, const char * cours, const char * category, <file>)
-   * PLUS les fonctions interagissant avec les fichiers
+   * void add_category(const char * new_categorie, <wherever it is saved>)
+   * void add_cours(const char * new_cours, const char * category, <wherever it is saved>)
+   * void rename_cours(const char * old_name, const char * new_name, const char * category, <wherever it is saved>)
+   * void edit_description(const char * text, const char * cours, const char * category, <wherever it is saved>)
+   * PLUS les fonctions interagissant avec les wherever it is...
 
 3. Questions
   
@@ -65,7 +64,7 @@
    La subtilité de GTK est que tout widget (typé GtkWidget *) possède une notion d'héritage du widget supérieur. En clair, chaque widget possède une hiérarchie en fonction d'où il est placé (dans une fenêtre, une boite de dialogue, etc). Les fonctions utilisables sur un widget peuvent donc être appliquées sur tous les "sous-widgets" qu'il contient.
 
    La gestion des events avec GTK se fait via des signals avec :
-   * g_signal_connect(G_OBJECT(GtkWidget * widget_who_get_signal),"nom_du_signal", G_CALLBACK(fonction_appelée), gptr * parametre_à_passer_à_la_fonction)
+   * g_signal_connect(G_OBJECT(widget_qui_accueil_le_signal),"nom_du_signal", G_CALLBACK(fonction_appelée), ptr * parametre_à_passer_à_la_fonction)
 
    Pour disposer plusieurs widgets (comme les boutons, les espaces de saisies, etc.) dans un seul container, il faut utiliser une Gtkwidget * grid, qui va cadrier l'espace du conteneur en plusieurs "sous-conteneurs" dans lesquels on va pouvoir "l'attacher":
    * void * gtk_grid_attach(GTK_GRID(grid), gp * contenu, int case_x, int case_y, int largeur_en_case ,int_hauteur_en_case); // l'origine du repère se situe en haut à gauche
