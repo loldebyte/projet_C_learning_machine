@@ -45,7 +45,7 @@
    * void card_color_change(const char * color)
    * void font_size_change(const char * font)
    * void sound(void) // change sound param, if sound = true then sound <- false else sound <- true
-   * void help(void) // idem pour l'aide
+   * void help(void)  // idem pour l'aide
 
 2. Cours
    Pour implémenter les fonctionnalités liées aux cours, il est nécessaire de créer de nombreuses fonctions permettant aux fonctions spécifiques aux fonctionnalités listées de fonctionner correctement : 
