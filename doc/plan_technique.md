@@ -6,8 +6,6 @@
     * Possibilité de changer la couleur du fond d’écran  
     * Possibilité de changer la couleur de la carte  
     * Possibilité de choisir la taille de la police  
-    * Possibilité d’activer / désactiver le son  
-    * Activer / désactiver les aides à l’utilisation  
   * Cours
     * Possibilité de créer un cours dans une catégorie  
     * Possibilité de créer une catégorie ou d’en effacer une  
@@ -44,8 +42,6 @@
    * void background_color_change(const char * color) // utiliser fgets et strstr puis fseek avec une valeur hardcodée(correspondant au contenu de create_default_settings_file) pour faire pointer le filestream au bon endroit
    * void card_color_change(const char * color)
    * void font_size_change(const char * font)
-   * void sound(void) // change sound param, if sound = true then sound <- false else sound <- true
-   * void help(void)  // idem pour l'aide
 
 2. Cours
    Pour implémenter les fonctionnalités liées aux cours, il est nécessaire de créer de nombreuses fonctions permettant aux fonctions spécifiques aux fonctionnalités listées de fonctionner correctement : 
