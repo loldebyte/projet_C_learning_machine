@@ -78,6 +78,9 @@ void dbinsert(MYSQL * con, char * query){
       printf("\ndebug : request correctely sent");
 }
 
+void close_window(GtkWidget * button, GtkWidget *principal_window){
+    gtk_window_close(GTK_WINDOW(principal_window));
+}
 
 void close_popup(GtkWidget* popup, int * lock){
 
@@ -92,6 +95,16 @@ typedef struct form_lesson{
     int statement;
 
 }form_lesson;
+
+typedef struct identified_entry{
+    GtkWidget * entry;
+    int identifier;
+}identified_entry;
+
+typedef struct identified_row{
+    int identifier;
+    const char * content;
+}identified_row;
 
 void insert_lesson (GtkWidget * button, form_lesson * submit){
 
@@ -114,12 +127,6 @@ void insert_lesson (GtkWidget * button, form_lesson * submit){
     printf("\ndebug : Nom : %s | Description : %s | Date : %s\n", text_nom, text_description, text_date);
     sprintf(query, "INSERT INTO cours VALUES(NULL,'%s','%s','%s', NULL);", text_nom, text_date, text_description);
     free(text_date);
-    /*strcat(query, text_nom);
-    strcat(query, "','");
-    strcat(query, text_date);
-    strcat(query, "','");
-    strcat(query, text_description);
-    strcat(query, "')");*/
     printf("\nquery : %s\n", query);
 
     MYSQL* con = open_database();
@@ -190,67 +197,234 @@ void free_lock(GtkWidget * window, int * lock){
     printf("lock is free");
 }
 
+GtkWidget* load_questions(int identifier){
+    MYSQL* con = open_database();
+    MYSQL_RES * result;
+    MYSQL_ROW row;
+    GtkWidget * question_list;
+    GtkWidget * result_list;
+    char * entire_row;
+    char * query;
+    query = malloc(65);
+    sprintf(query, "SELECT id_question, enonce FROM question where id_cours = %d", identifier);
+
+    question_list = gtk_list_box_new();
+    dbinsert(con, "use project");
+    result = dbquery(con, query);
+    int num_fields = mysql_num_fields(result);
+
+    while (row = mysql_fetch_row(result)){
+        entire_row = malloc(305);    
+        printf("\ndebug : boucle\n"); 
+        sprintf(entire_row, "%s:%s", row[0], row[1]);
+        printf("\n row : %s\n", entire_row);
+        result_list = gtk_label_new(entire_row);
+        printf("\ndebug : result_list affectation : %s\n", entire_row);
+        gtk_list_box_prepend(GTK_LIST_BOX(question_list), GTK_WIDGET(result_list));
+        printf("\ndebug : added in listbox\n");
+        free(entire_row);
+        printf("\ndebug : entire_row liberated\n");
+            
+    }
+    printf("\ndebug : sortie de boucle\n");
+    printf("\ndebug : sortie de boucle\n");
+    mysql_free_result(result);
+    mysql_close(con);
+    free(query);
+    
+    return question_list;
+
+}
+
+GtkWidget * load_courses(){
+    MYSQL* con = open_database();
+    MYSQL_RES * result;
+    MYSQL_ROW row;
+    GtkWidget * liste_cours;
+    GtkWidget * result_list; // Created to stock each row into label
+    char * entire_row;
+
+    liste_cours = gtk_list_box_new();
+
+    dbinsert(con, "use project");
+    result = dbquery(con, "SELECT id_cours, nom_cours FROM cours");
+    
+    while ((row = mysql_fetch_row(result))) 
+    {
+
+        entire_row = malloc(55);    
+        printf("\ndebug : boucle\n"); 
+        sprintf(entire_row, "%s:%s", row[0], row[1]);
+            printf("\n row : %s\n", entire_row);
+            result_list = gtk_label_new(entire_row);
+            printf("\ndebug : result_list affectation : %s\n", entire_row);
+            gtk_list_box_prepend(GTK_LIST_BOX(liste_cours), GTK_WIDGET(result_list));
+            printf("\ndebug : added in listbox\n");
+            free(entire_row);
+            
+    }
+    printf("\ndebug : sortie de boucle");
+    mysql_free_result(result);
+    mysql_close(con);
+    
+    return liste_cours;
+}
+
+
+identified_row get_row (GtkWidget * listbox){
+    identified_row cours;
+    //cours = malloc(sizeof(cours));
+    GtkWidget * label;
+    GtkListBoxRow * row;
+    const char * temp;
+    char * temp_number;
+    char * final_id;
+    int delimiter_position;
+
+    final_id = malloc(3);
+    for(int i=0; i<3; i++)
+        *(final_id+i) = '\0'; 
+    printf("\ndebug : get_row launched\n");
+    row = gtk_list_box_get_selected_row(GTK_LIST_BOX(listbox));
+    printf("\ndebug :  value is row\n");
+    label = gtk_bin_get_child(GTK_BIN(row));
+    printf("\ndebug : label set\n");
+    temp = gtk_label_get_label(GTK_LABEL(label));
+    printf("\ndebug : temp is %s\n", temp);
+    cours.content = strchr(temp, ':') + 1;
+    printf("\ndebug : content is %s\n", cours.content);
+    temp_number = strchr(temp, ':');
+    delimiter_position = temp_number - temp;
+    printf("\ndebug : position = %d\n", delimiter_position);
+    strncpy(final_id, temp, delimiter_position);
+    printf("\ndebug : final id : %s\n", final_id);
+    cours.identifier = atoi(final_id);
+    printf("\ndebug : id : %d\n", cours.identifier);
+    
+    free(final_id);
+    return cours;
+    
+}
+
+void rename_cours(GtkWidget * button, identified_entry * cours){
+
+    //""
+    gchar * text_nom;
+    text_nom = malloc(50);
+    char query[300];
+    printf("\ndebug : rename protocol launched, id is %d\n", cours->identifier);
+    text_nom = gtk_entry_get_text(GTK_ENTRY(cours->entry));
+    printf("\ndebug : new text is %s\n", text_nom);
+    sprintf(query, "UPDATE cours SET nom_cours = '%s' where id_cours = '%d'", text_nom, cours->identifier);
+    printf("\ndebug : query is %s\n", query);
+    free(text_nom);
+
+    MYSQL* con = open_database();
+    dbinsert(con, "use project;");
+    dbinsert(con, query);
+    mysql_close(con);
+    
+}
+void delete_from_cours(GtkWidget * button, int identifier){
+    printf("\ndebug : delete started for %d\n", identifier);
+    char query[300];
+    sprintf(query, "DELETE FROM cours where id_cours = '%d'", identifier);
+    MYSQL* con = open_database();
+    dbinsert(con, "use project;");
+    dbinsert(con, query);
+    mysql_close(con);
+    printf("\ndebug : delete endend correctely for %d\n", identifier);
+}
+
+void modify_quiz (identified_row cours){
+    printf("\ndebug : Modification de quizz lancé\n");
+
+    GtkWidget * grid, *principal_window, *question_list, *modify_button, *add_button, *delete_cours, *rename;
+    identified_entry * entry_cours;
+    entry_cours = malloc(sizeof(entry_cours));
+    int * lock_ptr;
+    lock_ptr = malloc(sizeof(int));
+    *lock_ptr = 0;
+    principal_window = generate_window(cours.content, 800, 800);
+    grid = gtk_grid_new();
+    gtk_container_add (GTK_CONTAINER(principal_window), grid);
+
+    question_list = load_questions(cours.identifier);
+    printf("\ndebug : questions loaded\n");
+
+    gtk_grid_attach(GTK_GRID(grid), GTK_WIDGET(question_list), 0, 0, 1, 1);
+
+    if(gtk_list_box_get_selected_row(GTK_LIST_BOX(question_list))){
+        modify_button = gtk_button_new_with_label("Modifier");
+        gtk_grid_attach(GTK_GRID(grid), GTK_WIDGET(modify_button), 1, 0, 1, 1);
+    }
+
+    add_button = gtk_button_new_with_label("Ajouter une question et sa réponse");
+    gtk_grid_attach(GTK_GRID(grid), GTK_WIDGET(add_button), 0, 1, 1, 1);   
+    printf("\nLesson : Lock : %d | %d\n",lock_ptr, *lock_ptr);
+    //g_signal_connect(add_button, "clicked", G_CALLBACK(cours_form), lock_ptr);
+
+    entry_cours->entry = gtk_entry_new();
+    entry_cours->identifier = cours.identifier;
+    gtk_entry_set_text(GTK_ENTRY(entry_cours->entry), cours.content);
+    gtk_grid_attach(GTK_GRID(grid), GTK_WIDGET(entry_cours->entry), 1, 0, 1, 1);
+
+    rename = gtk_button_new_with_label("Renommer");
+    gtk_grid_attach(GTK_GRID(grid), GTK_WIDGET(rename), 2, 0, 1, 1 );
+    g_signal_connect(rename, "clicked", G_CALLBACK(rename_cours), entry_cours);
+
+    delete_cours = gtk_button_new_with_label("Supprimer le cours");
+    gtk_grid_attach(GTK_GRID(grid), GTK_WIDGET(delete_cours), 3, 1, 1, 1 );
+    g_signal_connect(delete_cours, "clicked", G_CALLBACK(delete_from_cours), entry_cours->identifier);
+    g_signal_connect(delete_cours, "clicked", G_CALLBACK(close_window), principal_window);
+    
+    gtk_widget_show_all(principal_window);
+}
+void modify_quiz_transition(GtkWidget * button, GtkWidget * listbox){
+    identified_row cours;
+    cours = get_row(listbox);
+    printf("\ndebug : transition ready with id %d and cours %s\n", cours.identifier, cours.content);
+    modify_quiz(cours);
+}
+
 void lessons(){
 
 
     printf("\ndebug : Cours lancé\n");
     char * title = "Mes cours";
     int * lock_ptr;
-    int i, j;
     lock_ptr = malloc(sizeof(lock_ptr));
     *lock_ptr = 0;
-    GtkWidget * grid, *principal_window, *label_cours1, *label_cours2, *liste_cours, *cours_button;
-    label_cours1 = gtk_label_new("Cours 1");
-    label_cours2 = gtk_label_new("Cours 2");
-
-    MYSQL* con = open_database();
-    MYSQL_RES * result;
+    GtkWidget * grid, *principal_window, *liste_cours, *cours_button, *modify_button;
 
     principal_window = generate_window(title, 800, 800);
     grid = gtk_grid_new();
     gtk_container_add (GTK_CONTAINER(principal_window), grid);
-
-    liste_cours = gtk_list_box_new();
-    gtk_list_box_prepend(GTK_LIST_BOX(liste_cours), GTK_WIDGET(label_cours1));
-    gtk_list_box_prepend(GTK_LIST_BOX(liste_cours), GTK_WIDGET(label_cours2));
 
     cours_button = gtk_button_new_with_label("Ajouter un cours");
     gtk_grid_attach(GTK_GRID(grid), GTK_WIDGET(cours_button), 0, 1, 1, 1);   
     printf("\nLesson : Lock : %d | %d\n",lock_ptr, *lock_ptr);
     g_signal_connect(cours_button, "clicked", G_CALLBACK(cours_form), lock_ptr);
 
-    dbinsert(con, "use project");
-    result = dbquery(con, "SELECT nom_cours FROM cours");
-    int num_fields = mysql_num_fields(result);
-    MYSQL_ROW row;
-    GtkWidget * result_list;
-    /*for (i=0 ; i<num_fields ; i++){
-       *(result_list + i) = malloc(sizeof(GtkWidget));
-    }*/
-    i = 0;
-    printf("\ndebug : malloc effectué\n");
-    while ((row = mysql_fetch_row(result))) 
-    {
-        printf("\ndebug : boucle\n"); 
-            printf("\n row[%d] : %s\n", i, row[0]);
-            result_list = gtk_label_new(row[0]);
-            printf("\ndebug : recent_list[%d] affectation : %s\n", i, row[0]);
-            gtk_list_box_prepend(GTK_LIST_BOX(liste_cours), GTK_WIDGET(result_list));
-            printf("\ndebug : added in listbox\n");
-            
-    }
-    printf("\ndebug : sortie de boucle");
+    liste_cours = load_courses();
+
+    printf("\n debug : load successful\n");
     gtk_grid_attach(GTK_GRID(grid), GTK_WIDGET(liste_cours), 0, 0, 1, 1);
     
-    // mysql_free_result(result);
-    // mysql_close(con);
     
+    cours_button = gtk_button_new_with_label("Rafraichir");
+    gtk_grid_attach(GTK_GRID(grid), GTK_WIDGET(cours_button), 1, 1, 1, 1);
+    g_signal_connect(cours_button, "clicked", G_CALLBACK(transition_lessons), principal_window);
 
+    //if(gtk_list_box_get_selected_row(GTK_LIST_BOX(liste_cours))){
+        modify_button = gtk_button_new_with_label("Modifier");
+        gtk_grid_attach(GTK_GRID(grid), GTK_WIDGET(modify_button), 2, 1, 1, 1);
+    //}
+    g_signal_connect(modify_button, "clicked", G_CALLBACK(modify_quiz_transition), liste_cours);
+    
     g_signal_connect(principal_window, "destroy", G_CALLBACK(free_lock), lock_ptr);
-    
-    
-    
-    
+
+
     gtk_widget_show_all(principal_window);
 
 }
@@ -259,6 +433,7 @@ void transition_lessons(GtkWidget * button, GtkWidget *principal_window){
     gtk_window_close(GTK_WINDOW(principal_window));
     lessons();
 }
+
 
 void home(){
     printf("\ndebug : Home lancé\n");
