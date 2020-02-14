@@ -12,13 +12,13 @@ void close_popup();
 void cours_form();
 /**/
 void free_lock();
-/**/
+/* creates widgets related to lessons : window & buttons */
 void lessons();
-/**/
+/* closes window passed as argument and opens lessons-related widgets (via a call to lessons) */
 void transition_lessons();
-/**/
+/* creates main window and related widgets */
 void home();
-/**/
+/* closes window passed as argument and calls home() */
 void transition_home();
 /* executes a DB query without expecting a result, used to specify what db to work on and/or insert new values in the DB */
 void dbinsert(MYSQL *, char *);

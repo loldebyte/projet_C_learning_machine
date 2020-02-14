@@ -78,8 +78,7 @@ void close_window(GtkWidget * button, GtkWidget *principal_window){
     gtk_window_close(GTK_WINDOW(principal_window));
 }
 
-void close_popup(GtkWidget* popup, int * lock){
-
+void close_popup(GtkWidget* popup, int * lock) {
     *lock = 0;
     printf("\ndebug : lock is 0\n");
 }
@@ -101,8 +100,7 @@ typedef struct identified_row{
     const char * content;
 }identified_row;
 
-void insert_lesson (GtkWidget * button, form_lesson * submit){
-
+void insert_lesson (GtkWidget * button, form_lesson * submit) {
     const gchar * text_nom;
     const gchar * text_description;
     gchar * text_date;
@@ -113,7 +111,7 @@ void insert_lesson (GtkWidget * button, form_lesson * submit){
     text_date = malloc(10);
     text_date = get_date(text_date);
 
-    if (text_nom == 0 || text_description == 0){
+    if (text_nom == 0 || text_description == 0) {
         submit->statement = 0;
         return;
     }
@@ -132,15 +130,14 @@ void insert_lesson (GtkWidget * button, form_lesson * submit){
 
 void cours_form(GtkWidget* button, int * lock) {
     //////////////Lock checkout
-    if (*lock){
+    if (*lock) {
         printf("\ndebug : form already opened (lock : %d)\n", *lock);
         return;
-    }else{
+    }
+    else {
         *lock = 1;
         printf("\ndebug : log is %d\n", *lock);
     }
-
-    
 
     printf("\ndebug : Formulaire lancé\n");
     char * title = "Création de cours";
@@ -154,7 +151,6 @@ void cours_form(GtkWidget* button, int * lock) {
     grid = gtk_grid_new();
     gtk_container_add (GTK_CONTAINER(submit->principal_window), grid);
     
-
     submit->nom = gtk_entry_new();
     gtk_entry_set_max_length (GTK_ENTRY(submit->nom), 50);
     gtk_grid_attach(GTK_GRID(grid), submit->nom, 1, 0, 1, 1);
@@ -177,7 +173,6 @@ void cours_form(GtkWidget* button, int * lock) {
 
     g_signal_connect(submit->principal_window, "destroy", G_CALLBACK(close_popup), lock);
     gtk_widget_show_all(submit->principal_window);
-
 }
 
 void free_lock(GtkWidget * window, int * lock){
@@ -295,7 +290,6 @@ identified_row get_row (GtkWidget * listbox){
 }
 
 void rename_cours(GtkWidget * button, identified_entry * cours){
-
     //""
     gchar * text_nom;
     text_nom = malloc(50);
@@ -376,8 +370,6 @@ void modify_quiz_transition(GtkWidget * button, GtkWidget * listbox){
 }
 
 void lessons(){
-
-
     printf("\ndebug : Cours lancé\n");
     char * title = "Mes cours";
     int * lock_ptr;
@@ -412,16 +404,13 @@ void lessons(){
     
     g_signal_connect(principal_window, "destroy", G_CALLBACK(free_lock), lock_ptr);
 
-
     gtk_widget_show_all(principal_window);
-
 }
 
 void transition_lessons(GtkWidget * button, GtkWidget *principal_window){
     gtk_window_close(GTK_WINDOW(principal_window));
     lessons();
 }
-
 
 void home(){
     printf("\ndebug : Home lancé\n");
@@ -431,7 +420,7 @@ void home(){
     principal_window = generate_window(title, 800, 800);
 
     grid = gtk_grid_new();
-    gtk_container_add (GTK_CONTAINER(principal_window), grid);
+    gtk_container_add(GTK_CONTAINER(principal_window), grid);
 
     label_cours = gtk_label_new("Consulter, ajouter ou modifier mes cours");
     gtk_grid_attach(GTK_GRID(grid), label_cours, 0, 1, 1, 1);
@@ -441,11 +430,8 @@ void home(){
     gtk_grid_attach(GTK_GRID(grid), cours_button, 0, 0, 1, 1);
     g_signal_connect(cours_button, "clicked", G_CALLBACK(transition_lessons), principal_window);
 
-
     gtk_widget_show_all(principal_window);
-
 }
-
 
 void transition_home(GtkWidget * principal_window){
     gtk_window_close(GTK_WINDOW(principal_window));
