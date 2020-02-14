@@ -5,6 +5,71 @@
 #include <string.h>
 #include "smartlearnlib.h"
 
+
+void get_params(int *size_x, int *size_y, int * position, int *windowed){
+    
+    FILE * pf;
+    char * fullscreen;
+    char * get_position;
+    char * get_size_x;
+    char * get_size_y;
+    char * cursor;
+    int inter;
+
+    cursor = malloc(sizeof(char)*255);
+
+    pf = fopen("parameters.conf","rt");
+    printf("\ndebug : file opened\n");
+
+    if(!pf)
+        return;
+
+    fullscreen = malloc(sizeof(char)*255);
+    fgets(fullscreen,255,pf);
+    if (strstr(fullscreen,"NO")){
+        *windowed = 1;
+        printf("\ndebug : is not fullscreen\n");
+    }else{
+        *windowed = 0;
+    }
+
+    get_position = malloc(sizeof(char)*255);
+    fgets(get_position,255,pf);
+    cursor = strstr(get_position,":");
+    inter =atoi(cursor+2);
+    *position = inter;
+    printf("\ndebug : position is %d\n", *position);
+
+    get_size_x = malloc(sizeof(char)*255);
+    fgets(get_size_x,255,pf);
+    cursor = strstr(get_size_x,":");
+    inter = atoi(cursor+2);
+    *size_x = inter; 
+    printf("\ndebug : size x is %d\n", *size_x);
+
+    get_size_y = malloc(sizeof(char)*255);
+    fgets(get_size_y,255,pf);
+    cursor = strstr(get_size_y,":");
+    inter = atoi(cursor+2);
+    *size_y = inter; 
+    printf("\ndebug : size y is %d\n", *size_y);
+
+    free(get_size_x);
+    printf("\nfree 1\n");
+    free(get_size_y);
+    printf("\nfree 2\n");
+    free(get_position);
+    printf("\nfree 3\n");
+    free(fullscreen);
+    printf("\nfree 4\n");
+    //free(cursor);
+    printf("\nfree 5\n");
+    fclose(pf);
+    printf("\nclosed");
+}
+
+
+
 char * get_date(char * date){
   time_t t = time(NULL);
   struct tm tm = *localtime(&t);
@@ -13,23 +78,48 @@ char * get_date(char * date){
   return date;
 }
 
-void finish_with_error(MYSQL *con) {
+void finish_with_error(MYSQL *con)
+{
   fprintf(stderr, "%s\n", mysql_error(con));
   mysql_close(con);
   exit(1);        
 }
 
-GtkWidget * generate_window(char * title, int height, int width){
+GtkWidget * generate_window(char * title){
     GtkWidget* p_window;
     p_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    int size_x, size_y, windowed, position;
+
+    get_params(&size_x, &size_y, &position, &windowed);
+    printf("\ndebug : file closed with values:\nsize_x : %d\nsize_y : %d\nwindowed : %d\nposition : %d\n", size_x, size_y, windowed, position);
+
+    switch(position){
+        case 1 : gtk_window_set_position (GTK_WINDOW (p_window), GTK_WIN_POS_NONE);
+                 printf("\ndebug : case is %d\n", position);
+        break;
+        case 2 : gtk_window_set_position (GTK_WINDOW (p_window), GTK_WIN_POS_CENTER);
+        break;
+        case 3 : gtk_window_set_position (GTK_WINDOW (p_window), GTK_WIN_POS_MOUSE);
+        break;
+        case 4 : gtk_window_set_position (GTK_WINDOW (p_window), GTK_WIN_POS_CENTER_ALWAYS);
+        break;
+        default : gtk_window_set_position (GTK_WINDOW (p_window), GTK_WIN_POS_NONE);
+    }
+
+    if(windowed == 1){
+        gtk_window_set_default_size(GTK_WINDOW(p_window), size_x, size_y);
+    }
+    if(windowed == 0){
+        gtk_window_fullscreen (GTK_WINDOW(p_window));
+    }
+
     gtk_window_set_title(GTK_WINDOW(p_window), title);
-    gtk_window_set_default_size(GTK_WINDOW(p_window), height, width);
-    gtk_window_set_position (GTK_WINDOW (p_window), GTK_WIN_POS_CENTER);
+
     return p_window;
 
 };
 
-MYSQL* open_database() { // Don't forget to close the connexion !
+MYSQL* open_database(){ // Don't forget to close the connexion !
     MYSQL *con = mysql_init(NULL);
 
     if (con == NULL) 
@@ -39,7 +129,8 @@ MYSQL* open_database() { // Don't forget to close the connexion !
         exit(1);
     }
 
-    if (mysql_real_connect(con, "localhost", "developper", "project", NULL, 0, NULL, 0) == NULL) 
+    if (mysql_real_connect(con, "localhost", "developper", "project", 
+            NULL, 0, NULL, 0) == NULL) 
     {
         printf("%s\n", mysql_error(con));
         printf("\ndebug : DTB connexion is not open\n");
@@ -51,13 +142,15 @@ MYSQL* open_database() { // Don't forget to close the connexion !
 }
 
 MYSQL_RES * dbquery(MYSQL * con, char * query){
-    if (mysql_query(con, query)) {
+    if (mysql_query(con, query)) 
+  {
       printf("\ndebug : error during query\n");
       finish_with_error(con);
   }
   MYSQL_RES *result = mysql_store_result(con);
   
-  if (result == NULL) {     
+  if (result == NULL) 
+  {     
       printf("\ndebug : result is NULL\n");
       finish_with_error(con);
   }
@@ -65,7 +158,7 @@ MYSQL_RES * dbquery(MYSQL * con, char * query){
     return result;
 }
 
-void dbinsert(MYSQL * con, char * query) {
+void dbinsert(MYSQL * con, char * query){
     if (mysql_query(con, query)) 
   {
       printf("\ndebug : error during query\n");
@@ -78,7 +171,8 @@ void close_window(GtkWidget * button, GtkWidget *principal_window){
     gtk_window_close(GTK_WINDOW(principal_window));
 }
 
-void close_popup(GtkWidget* popup, int * lock) {
+void close_popup(GtkWidget* popup, int * lock){
+
     *lock = 0;
     printf("\ndebug : lock is 0\n");
 }
@@ -88,6 +182,7 @@ typedef struct form_lesson{
     GtkWidget * description;
     GtkWidget * principal_window;
     int statement;
+
 }form_lesson;
 
 typedef struct identified_entry{
@@ -100,7 +195,8 @@ typedef struct identified_row{
     const char * content;
 }identified_row;
 
-void insert_lesson (GtkWidget * button, form_lesson * submit) {
+void insert_lesson (GtkWidget * button, form_lesson * submit){
+
     const gchar * text_nom;
     const gchar * text_description;
     gchar * text_date;
@@ -111,7 +207,8 @@ void insert_lesson (GtkWidget * button, form_lesson * submit) {
     text_date = malloc(10);
     text_date = get_date(text_date);
 
-    if (text_nom == 0 || text_description == 0) {
+
+    if (text_nom == 0 || text_description == 0){
         submit->statement = 0;
         return;
     }
@@ -126,18 +223,23 @@ void insert_lesson (GtkWidget * button, form_lesson * submit) {
     dbinsert(con, query);
     mysql_close(con);
     gtk_window_close(GTK_WINDOW(submit->principal_window));
+
+    
 }
 
-void cours_form(GtkWidget* button, int * lock) {
+void cours_form(GtkWidget* button, int * lock){
+
+    
     //////////////Lock checkout
-    if (*lock) {
+    if (*lock){
         printf("\ndebug : form already opened (lock : %d)\n", *lock);
         return;
-    }
-    else {
+    }else{
         *lock = 1;
         printf("\ndebug : log is %d\n", *lock);
     }
+
+    
 
     printf("\ndebug : Formulaire lancé\n");
     char * title = "Création de cours";
@@ -147,10 +249,11 @@ void cours_form(GtkWidget* button, int * lock) {
 
     submit->statement = 0;
     
-    submit->principal_window = generate_window(title, 800, 800);
+    submit->principal_window = generate_window(title);
     grid = gtk_grid_new();
     gtk_container_add (GTK_CONTAINER(submit->principal_window), grid);
     
+
     submit->nom = gtk_entry_new();
     gtk_entry_set_max_length (GTK_ENTRY(submit->nom), 50);
     gtk_grid_attach(GTK_GRID(grid), submit->nom, 1, 0, 1, 1);
@@ -158,6 +261,7 @@ void cours_form(GtkWidget* button, int * lock) {
     label_nom = gtk_label_new("Nom du cours");
     gtk_grid_attach(GTK_GRID(grid), label_nom, 0, 0, 1, 1);
     //text_nom = gtk_entry_get_text(submit->nom);
+
 
     submit->description = gtk_entry_new();
     gtk_entry_set_max_length (GTK_ENTRY(submit->description), 300);
@@ -167,12 +271,14 @@ void cours_form(GtkWidget* button, int * lock) {
     gtk_grid_attach(GTK_GRID(grid), label_description, 0, 1, 1, 1);
     //text_description = gtk_entry_get_text(description);
 
+
     creation_button = gtk_button_new_with_label("Créer");
     gtk_grid_attach(GTK_GRID(grid), creation_button, 0, 2, 1, 1 );
     g_signal_connect(creation_button, "clicked", G_CALLBACK(insert_lesson), submit);
 
     g_signal_connect(submit->principal_window, "destroy", G_CALLBACK(close_popup), lock);
     gtk_widget_show_all(submit->principal_window);
+
 }
 
 void free_lock(GtkWidget * window, int * lock){
@@ -290,14 +396,20 @@ identified_row get_row (GtkWidget * listbox){
 }
 
 void rename_cours(GtkWidget * button, identified_entry * cours){
+
     //""
     gchar * text_nom;
+    int identifier;
+    GtkWidget * entry;
+
+    identifier = cours->identifier;
+    entry = cours->entry;
     text_nom = malloc(50);
     char query[300];
-    printf("\ndebug : rename protocol launched, id is %d\n", cours->identifier);
-    text_nom = gtk_entry_get_text(GTK_ENTRY(cours->entry));
+    printf("\ndebug : rename protocol launched, id is %d\n", identifier);
+    text_nom = gtk_entry_get_text(GTK_ENTRY(entry));
     printf("\ndebug : new text is %s\n", text_nom);
-    sprintf(query, "UPDATE cours SET nom_cours = '%s' where id_cours = '%d'", text_nom, cours->identifier);
+    sprintf(query, "UPDATE cours SET nom_cours = '%s' where id_cours = '%d'", text_nom, identifier);
     printf("\ndebug : query is %s\n", query);
     free(text_nom);
 
@@ -327,7 +439,7 @@ void modify_quiz (identified_row cours){
     int * lock_ptr;
     lock_ptr = malloc(sizeof(int));
     *lock_ptr = 0;
-    principal_window = generate_window(cours.content, 800, 800);
+    principal_window = generate_window(cours.content);
     grid = gtk_grid_new();
     gtk_container_add (GTK_CONTAINER(principal_window), grid);
 
@@ -357,7 +469,7 @@ void modify_quiz (identified_row cours){
 
     delete_cours = gtk_button_new_with_label("Supprimer le cours");
     gtk_grid_attach(GTK_GRID(grid), GTK_WIDGET(delete_cours), 3, 1, 1, 1 );
-    g_signal_connect(delete_cours, "clicked", G_CALLBACK(delete_from_cours), entry_cours->identifier);
+    g_signal_connect(delete_cours, "clicked", G_CALLBACK(delete_from_cours), &entry_cours->identifier);
     g_signal_connect(delete_cours, "clicked", G_CALLBACK(close_window), principal_window);
     
     gtk_widget_show_all(principal_window);
@@ -370,6 +482,8 @@ void modify_quiz_transition(GtkWidget * button, GtkWidget * listbox){
 }
 
 void lessons(){
+
+
     printf("\ndebug : Cours lancé\n");
     char * title = "Mes cours";
     int * lock_ptr;
@@ -377,7 +491,7 @@ void lessons(){
     *lock_ptr = 0;
     GtkWidget * grid, *principal_window, *liste_cours, *cours_button, *modify_button;
 
-    principal_window = generate_window(title, 800, 800);
+    principal_window = generate_window(title);
     grid = gtk_grid_new();
     gtk_container_add (GTK_CONTAINER(principal_window), grid);
 
@@ -404,7 +518,9 @@ void lessons(){
     
     g_signal_connect(principal_window, "destroy", G_CALLBACK(free_lock), lock_ptr);
 
+
     gtk_widget_show_all(principal_window);
+
 }
 
 void transition_lessons(GtkWidget * button, GtkWidget *principal_window){
@@ -412,15 +528,16 @@ void transition_lessons(GtkWidget * button, GtkWidget *principal_window){
     lessons();
 }
 
+
 void home(){
     printf("\ndebug : Home lancé\n");
     char * title = "Menu principal";
     GtkWidget * grid, *principal_window, *cours_button, *label_cours;
 
-    principal_window = generate_window(title, 800, 800);
+    principal_window = generate_window(title);
 
     grid = gtk_grid_new();
-    gtk_container_add(GTK_CONTAINER(principal_window), grid);
+    gtk_container_add (GTK_CONTAINER(principal_window), grid);
 
     label_cours = gtk_label_new("Consulter, ajouter ou modifier mes cours");
     gtk_grid_attach(GTK_GRID(grid), label_cours, 0, 1, 1, 1);
@@ -430,10 +547,14 @@ void home(){
     gtk_grid_attach(GTK_GRID(grid), cours_button, 0, 0, 1, 1);
     g_signal_connect(cours_button, "clicked", G_CALLBACK(transition_lessons), principal_window);
 
+
     gtk_widget_show_all(principal_window);
+
 }
+
 
 void transition_home(GtkWidget * principal_window){
     gtk_window_close(GTK_WINDOW(principal_window));
     home();
 }
+

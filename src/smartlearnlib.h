@@ -1,7 +1,7 @@
 /* terminates programm and flushes all streams */
 void finish_with_error();
 /* creates the window and sets its position and title */
-GtkWidget * generate_window(char *, int, int);
+GtkWidget * generate_window(char *);
 /* initializes the connexion to the DB and returns it */
 MYSQL* open_database();
 /* executes a DB query and returns its result as a MY_SQL_RES pointer */
