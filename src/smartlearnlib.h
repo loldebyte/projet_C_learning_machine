@@ -10,7 +10,7 @@ MYSQL_RES * dbquery();
 void close_popup();
 /**/
 void cours_form();
-/**/
+/* frees the int pointer lock */
 void free_lock();
 /* creates widgets related to lessons : window & buttons */
 void lessons();
@@ -22,3 +22,5 @@ void home();
 void transition_home();
 /* executes a DB query without expecting a result, used to specify what db to work on and/or insert new values in the DB */
 void dbinsert(MYSQL *, char *);
+/* closes window passed as argument */
+void close_window(GtkWidget *, GtkWidget *);
