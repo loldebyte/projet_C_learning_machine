@@ -15,7 +15,8 @@ typedef Struct settings {
     char fond[10];
 }settings;
 
-void create_default_settings_file(const char * path) {
+void create_default_settings_file(void) {
+    char * path = "settings.txt";
     FILE * file = fopen(path, "wb");
     uint8_t taille_police = 20;
     char carte[10] = "white";
@@ -26,7 +27,8 @@ void create_default_settings_file(const char * path) {
     fclose(file);
 }
 
-settings get_current_settings(const char * path) {
+settings get_current_settings(void) {
+    char * path = "settings.txt";
     FILE * file = fopen(path, "rb");
     uint8_t taille_police;
     char carte[10];
@@ -40,4 +42,9 @@ settings get_current_settings(const char * path) {
     current_settings.fond = fond;
     return current_settings;
     fclose(file);
+}
+
+int8_t conf_file_is_valid(void) {
+    char * path = "settings.txt";
+    
 }

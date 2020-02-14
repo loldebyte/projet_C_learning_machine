@@ -13,8 +13,7 @@ char * get_date(char * date){
   return date;
 }
 
-void finish_with_error(MYSQL *con)
-{
+void finish_with_error(MYSQL *con) {
   fprintf(stderr, "%s\n", mysql_error(con));
   mysql_close(con);
   exit(1);        
@@ -30,7 +29,7 @@ GtkWidget * generate_window(char * title, int height, int width){
 
 };
 
-MYSQL* open_database(){ // Don't forget to close the connexion !
+MYSQL* open_database() { // Don't forget to close the connexion !
     MYSQL *con = mysql_init(NULL);
 
     if (con == NULL) 
@@ -40,8 +39,7 @@ MYSQL* open_database(){ // Don't forget to close the connexion !
         exit(1);
     }
 
-    if (mysql_real_connect(con, "localhost", "developper", "project", 
-            NULL, 0, NULL, 0) == NULL) 
+    if (mysql_real_connect(con, "localhost", "developper", "project", NULL, 0, NULL, 0) == NULL) 
     {
         printf("%s\n", mysql_error(con));
         printf("\ndebug : DTB connexion is not open\n");
@@ -53,15 +51,13 @@ MYSQL* open_database(){ // Don't forget to close the connexion !
 }
 
 MYSQL_RES * dbquery(MYSQL * con, char * query){
-    if (mysql_query(con, query)) 
-  {
+    if (mysql_query(con, query)) {
       printf("\ndebug : error during query\n");
       finish_with_error(con);
   }
   MYSQL_RES *result = mysql_store_result(con);
   
-  if (result == NULL) 
-  {     
+  if (result == NULL) {     
       printf("\ndebug : result is NULL\n");
       finish_with_error(con);
   }
@@ -69,7 +65,7 @@ MYSQL_RES * dbquery(MYSQL * con, char * query){
     return result;
 }
 
-void dbinsert(MYSQL * con, char * query){
+void dbinsert(MYSQL * con, char * query) {
     if (mysql_query(con, query)) 
   {
       printf("\ndebug : error during query\n");
@@ -78,9 +74,7 @@ void dbinsert(MYSQL * con, char * query){
       printf("\ndebug : request correctely sent");
 }
 
-
-void close_popup(GtkWidget* popup, int * lock){
-
+void close_popup(GtkWidget* popup, int * lock) {
     *lock = 0;
     printf("\ndebug : lock is 0\n");
 }
@@ -90,11 +84,9 @@ typedef struct form_lesson{
     GtkWidget * description;
     GtkWidget * principal_window;
     int statement;
-
 }form_lesson;
 
-void insert_lesson (GtkWidget * button, form_lesson * submit){
-
+void insert_lesson (GtkWidget * button, form_lesson * submit) {
     const gchar * text_nom;
     const gchar * text_description;
     gchar * text_date;
@@ -104,7 +96,6 @@ void insert_lesson (GtkWidget * button, form_lesson * submit){
     text_description = gtk_entry_get_text(GTK_ENTRY(submit->description));
     text_date = malloc(10);
     text_date = get_date(text_date);
-
 
     if (text_nom == 0 || text_description == 0){
         submit->statement = 0;
@@ -127,13 +118,9 @@ void insert_lesson (GtkWidget * button, form_lesson * submit){
     dbinsert(con, query);
     mysql_close(con);
     gtk_window_close(GTK_WINDOW(submit->principal_window));
-
-    
 }
 
-void cours_form(GtkWidget* button, int * lock){
-
-    
+void cours_form(GtkWidget* button, int * lock) {
     //////////////Lock checkout
     if (*lock){
         printf("\ndebug : form already opened (lock : %d)\n", *lock);
@@ -166,7 +153,6 @@ void cours_form(GtkWidget* button, int * lock){
     gtk_grid_attach(GTK_GRID(grid), label_nom, 0, 0, 1, 1);
     //text_nom = gtk_entry_get_text(submit->nom);
 
-
     submit->description = gtk_entry_new();
     gtk_entry_set_max_length (GTK_ENTRY(submit->description), 300);
     gtk_grid_attach(GTK_GRID(grid), submit->description, 1, 1, 1, 1);
@@ -174,7 +160,6 @@ void cours_form(GtkWidget* button, int * lock){
     label_description = gtk_label_new("Description");
     gtk_grid_attach(GTK_GRID(grid), label_description, 0, 1, 1, 1);
     //text_description = gtk_entry_get_text(description);
-
 
     creation_button = gtk_button_new_with_label("Créer");
     gtk_grid_attach(GTK_GRID(grid), creation_button, 0, 2, 1, 1 );
@@ -190,9 +175,7 @@ void free_lock(GtkWidget * window, int * lock){
     printf("lock is free");
 }
 
-void lessons(){
-
-
+void lessons() {
     printf("\ndebug : Cours lancé\n");
     char * title = "Mes cours";
     int * lock_ptr;

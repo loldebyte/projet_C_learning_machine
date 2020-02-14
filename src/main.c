@@ -3,6 +3,7 @@
 #include <gtk/gtk.h>
 #include <mysql.h>
 #include "smartlearnlib.h"
+#include "settings.h"
 
 
 int main(int argc,char **argv)
@@ -24,7 +25,6 @@ int main(int argc,char **argv)
     button = gtk_button_new_with_label("Commencer");
     gtk_grid_attach(GTK_GRID(grid), button, 0, 4, 3, 3);
     g_signal_connect(button, "clicked", G_CALLBACK(transition_home), principal_window);
-
     
     gtk_widget_show_all(principal_window);// Showing all the widget under principal_window
 
